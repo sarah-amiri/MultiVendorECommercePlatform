@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    ports:
+      - "5435:5432"
+    volumes:
+      - vendor-db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=vendorpassword
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=Vendor
+    networks:
+      - ecommerce-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8003"
+    depends_on:
+      - db
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: [
+        "CMD",
+        "python",
+        "-c",
+        "import requests; r = requests.get('http://localhost:8003/api/health'); exit(0) if r.status_code == 200 else exit(1);"
+      ]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  vendor-db:
+networks:
+  ecommerce-network:
+    driver: bridge

@@ -1,0 +1,42 @@
+services:
+  mongodb:
+    image: mongo:latest
+    volumes:
+      - ./db/initdb.d/product-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - product-db-data:/data/db
+      - product-db-log-data:/var/log/mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    networks:
+      - ecommerce-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8004:8004"
+    depends_on:
+      - mongodb
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: [
+        "CMD",
+        "python",
+        "-c",
+        "import requests; r = requests.get('http://localhost:8004/api/health'); exit(0) if r.status_code == 200 else exit(1);"
+      ]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  product-db-data:
+  product-db-log-data:
+networks:
+  ecommerce-network:
+    driver: bridge
