@@ -3,13 +3,15 @@ services:
     image: postgres:latest
     restart: always
     ports:
-      - "5434:5432"
+      - "${DB_PORT_EXPOSE}:${DB_PORT}"
+    env_file:
+      - .env
     volumes:
       - user-db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=userpassword
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=User
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_DB=${DB_NAME}
     networks:
       - ecommerce-network
 
@@ -18,7 +20,9 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8001:8001"
+      - "${APP_PORT_EXPOSE}:${APP_PORT}"
+    env_file:
+      - .env
     depends_on:
       - db
     networks:
@@ -28,7 +32,7 @@ services:
         "CMD",
         "python",
         "-c",
-        "import requests; r = requests.get('http://localhost:8001/api/health'); exit(0) if r.status_code == 200 else exit(1);"
+        "import requests; r = requests.get('http://localhost:${APP_PORT_EXPOSE}/api/health'); exit(0) if r.status_code == 200 else exit(1);"
       ]
       interval: 10s
       timeout: 10s

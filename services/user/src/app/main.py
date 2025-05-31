@@ -1,14 +1,10 @@
 from fastapi import FastAPI
+from src.app.api.router import router
 
-app = FastAPI()
 
+def create_application() -> FastAPI:
+    _app = FastAPI()
+    _app.include_router(router)
+    return _app
 
-@app.get(
-    '/api/health',
-)
-async def health_check():
-    return {
-        'name': 'User',
-        'description': 'User microservice for Multi-Vendor E-Commerce Platform app',
-        'version': '1.0.0',
-    }
+app = create_application()

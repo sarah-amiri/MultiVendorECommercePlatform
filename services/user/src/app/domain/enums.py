@@ -13,3 +13,7 @@ class UserAccountStatus(str, Enum):
     PENDING = 'pending'
     APPROVED = 'approved'
     INACTIVE = 'inactive'
+
+    @classmethod
+    def default(cls):
+        return cls.APPROVED
