@@ -1,26 +1,12 @@
 services:
-  db:
-    image: postgres:latest
-    restart: always
-    ports:
-      - "5433:5432"
-    volumes:
-      - auth-db:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD=authpassword
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=User
-    networks:
-      - ecommerce-network
-
   app:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8002:8002"
-    depends_on:
-      - db
+      - "${APP_PORT_EXPOSE}:${APP_PORT}"
+    env_file:
+      - .env
     networks:
       - ecommerce-network
     healthcheck:
@@ -28,14 +14,12 @@ services:
         "CMD",
         "python",
         "-c",
-        "import requests; r = requests.get('http://localhost:8002/api/health'); exit(0) if r.status_code == 200 else exit(1);"
+        "import requests; r = requests.get('http://localhost:${APP_PORT_EXPOSE}/api/health'); exit(0) if r.status_code == 200 else exit(1);"
       ]
       interval: 10s
       timeout: 10s
       retries: 3
 
-volumes:
-  auth-db:
 networks:
   ecommerce-network:
     driver: bridge

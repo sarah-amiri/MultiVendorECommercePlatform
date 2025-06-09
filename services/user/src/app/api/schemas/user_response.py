@@ -14,3 +14,10 @@ class UserDetailModel(BaseModel):
     last_name: str | None
     birthdate: date | None = Field(..., alias='date_of_birth')
     created_at: datetime
+
+
+class UserAuthenticatedModel(BaseModel):
+    id: int
+    user_type: str
+    status: str
+    

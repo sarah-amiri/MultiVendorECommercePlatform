@@ -57,3 +57,17 @@ class UserService:
             raise NotAcceptableException('user password is incorrect')
         updated_user = await self.repo.change_password(user, new_password)
         return orm_to_entity(updated_user)
+
+    async def authenticate_username_and_password(
+        self,
+        username: str,
+        password: str,
+    ):
+        user = await self.repo.get_by_username(username)
+        if user is None or not verify_password(password, user.password, user.salt):
+            raise NotFoundException('username or password is incorrect')
+        return {
+            'id': user.id,
+            'user_type': user.user_type.value,
+            'status': user.status.value,
+        }

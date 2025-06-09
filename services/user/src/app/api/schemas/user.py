@@ -39,3 +39,8 @@ class UserUpdateModel(BaseModel):
 class UserChangePasswordModel(BaseModel):
     old_password: str
     new_password: str
+
+
+class UsernamePasswordAuthenticateModel(BaseModel):
+    username: str
+    password: str

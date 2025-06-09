@@ -11,9 +11,11 @@ from src.app.domain.mappers import (
     schema_update_to_entity,
 )
 from src.app.api.schemas import (
+    UserAuthenticatedModel,
     UserChangePasswordModel,
     UserCreateModel,
     UserDetailModel,
+    UsernamePasswordAuthenticateModel,
     UserUpdateModel,
 )
 from src.app.services import UserService
@@ -92,3 +94,16 @@ async def delete_user(
     service: UserService = Depends(get_user_service),
 ):
     return await service.delete(user_id=user_id, session=session)
+
+
+@router.post(
+    '/authenticate',
+    status_code=200,
+    response_model=UserAuthenticatedModel,
+    responses={404: {}},
+)
+async def authenticate_user(
+    body: UsernamePasswordAuthenticateModel,
+    service: UserService = Depends(get_user_service),
+):
+    return await service.authenticate_username_and_password(body.username, body.password)

@@ -1,17 +1,34 @@
-import re
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Dict
+from .enums import LoginMethodType
 
-# minimum eight characters, at least one number, at lease one letter
-password_regex = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$"
+
+class LoginMethod(ABC):
+    @abstractmethod
+    def to_dict(self) -> Dict:
+        pass
+
+    @property
+    def method(self) -> str:
+        return ''
 
 
-@dataclass(frozen=True)
-class Password:
-    value: str
+@dataclass
+class UsernamePasswordLoginMethod(LoginMethod):
+    username: str
+    password: str
 
     def __post_init__(self):
-        if not re.fullmatch(password_regex, self.value):
-            raise ValueError(
-                'password must contain minimum eight characters, '
-                'at least one number and at least one number'
-            )
+        assert self.username, 'Username is required'
+        assert self.password, 'Password is required'
+
+    def to_dict(self) -> Dict:
+        return {
+            'username': self.username,
+            'password': self.password,
+        }
+
+    @property
+    def method(self):
+        return LoginMethodType.USERNAME_PASSWORD
