@@ -9,4 +9,5 @@ RUN python -m pip install -r requirements.txt
 WORKDIR /app
 COPY . /app
 
-CMD ["gunicorn", "-w", "2", "src.app.main:app", "-b", "0.0.0.0:8004"]
+RUN ["chmod", "+x", "/app/entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
